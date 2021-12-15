@@ -1,18 +1,12 @@
-from PyQt6.QtCore import *
-from PyQt6.QtWidgets import *
+from clipper.utils import *
 
-class MainWindow(QMainWindow):
-	def __init__(self):
-		super().__init__()
+import argparse
 
-		self.setWindowTitle("VCDL Version 0.0.1")
-		button = QPushButton("Press Me!")
+argParser = argparse.ArgumentParser()
+argParser.add_argument('-v', '--video-links', nargs='*', required=True)
+# argParser.add_argument('-ts', '--timestamps', required=True)
+args = argParser.parse_args()
 
-		self.setCentralWidget(button)
+thing = getAVUrls(args.video_links[0])
 
-app = QApplication([])
-
-window = MainWindow()
-window.show()
-
-app.exec()
+print(thing[0])
