@@ -1,15 +1,28 @@
+# I did not use pyton to code this by choice. I absolutely hate python. It doesn't make sense to me when I read it, and in my opinion
+# using indents as syntax is the most idiotic thing ever. But, it was the most suitable language to solve the problem I have, and thus
+# my hand is forced.
+#
+# Reluctantly programmed and tested by Sheer Curiosity
+
 from clipper.utils import *
+from clipper.downloader import *
 
 import argparse
 
 argParser = argparse.ArgumentParser()
-argParser.add_argument('-v', '--video-links', nargs='*', required=True)
-argParser.add_argument('-ts', '--timestamps', nargs=1)
+argParser.add_argument('-v', '--video-links', nargs='*')
+argParser.add_argument('-ts', '--timestamps')
 args = argParser.parse_args()
 
-urlLinks = []
+print(args.timestamps)
 
-for i in args.video_links:
-	urlLinks.append(getAVUrls(i))
+def runClipper(video_links: list, timestamps: str):
+	urlLinks = []
 
-parseTimestamps("[0:00-1:00],[1:20-1:30],[1:30-1:55]", len(urlLinks))
+	for i in video_links:
+		urlLinks.append(getAVUrls(i))
+	
+	startTs, runtimeTs = parseTimestamps(timestamps, len(urlLinks))
+	downloadClips(startTs, runtimeTs, urlLinks)
+
+runClipper(args.video_links, args.timestamps)
