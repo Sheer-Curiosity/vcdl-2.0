@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Stuff that shouldn't be on github
+/testing stuff
+cookies.txt
