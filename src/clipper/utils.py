@@ -3,8 +3,10 @@ from yt_dlp import *
 def getAVUrls(videoLink: str):
 	info = YoutubeDL({'quiet': True, 'no_warnings': True}).extract_info(videoLink, download=False)
 
+	print(f"[EXTRACTOR]: Identified link as {info['extractor']}")
+
 	if info['extractor'] == 'youtube':
-	
+		
 		formats = info['formats'][::-1]
 		best_video = next(f for f in formats if f['vcodec'] != 'none' and f['acodec'] == 'none' and f['ext'] == 'mp4')
 		best_audio = next(f for f in formats if f['acodec'] != 'none' and f['vcodec'] == 'none' and f['ext'] == 'm4a')
@@ -91,6 +93,7 @@ def parseTimestamps(timestampsInput: str, numVideoLinks: int):
 							if paddedTs[idx+1][3] <= paddedTs[idx][3]:
 								paddedTs[idx+1] = 'OVERLAP'
 								paddedTs[idx] = 'OVERLAP'
+								print(f"[TIMESTAMPS]: Post-buffer duration overlap found, combining clips {idx-1} and {idx}")
 		while 'OVERLAP' in paddedTs:
 			paddedTs.remove('OVERLAP')
 		startStamps = []
@@ -117,3 +120,6 @@ def parseTimestamps(timestampsInput: str, numVideoLinks: int):
 			runtimeStamps[idx4] = formatTimestamp(runtimeStamps[idx4])
 		
 		return startStamps, runtimeStamps
+
+def cleanup():
+	print()
