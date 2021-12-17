@@ -1,6 +1,6 @@
 import git
 
-__version = 'DEV-0.2.2'
+__version = 'DEV-0.2.3'
 
 def versionInfo(isDev: bool):
 	if isDev:

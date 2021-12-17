@@ -1,14 +1,14 @@
 # vcdl2
 A python rewrite of a clipping program. IN PROGRESS
 
-# Current Progress to Base Functionality: 70%
+# Current Progress to Base Functionality: 100%
 
 ## Base Functionality TODO:
 - ~~Link fetching for YouTube and BiliBili~~
 - ~~Timestamp processing for single videos~~
 - ~~clip downloading~~
-- clip stitching
-- output renaming
+- ~~clip stitching~~
+- ~~output renaming~~
 
 ## New Features TODO:
 

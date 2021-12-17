@@ -4,6 +4,7 @@
 #
 # Reluctantly written by Sheer Curiosity
 
+from clipper.merger import mergeClips
 from clipper.utils import *
 from clipper.downloader import *
 from utils.info import *
@@ -18,6 +19,7 @@ if os.path.isdir('./.git'):
 argParser = argparse.ArgumentParser()
 argParser.add_argument('-v', '--video-links', nargs='*')
 argParser.add_argument('-ts', '--timestamps')
+argParser.add_argument('-o', '--output-title', default='output')
 argParser.add_argument('--debug', action='store_true')
 args = argParser.parse_args()
 
@@ -32,7 +34,8 @@ def runClipper(video_links: list, timestamps: str):
 	
 	startTs, runtimeTs = parseTimestamps(timestamps, len(urlLinks))
 	numClips = downloadClips(startTs, runtimeTs, urlLinks)
-	print(numClips)
+	mergeClips(numClips, args.output_title)
+	cleanup()
 
 if args.debug:
 	print(versionInfo(isDev), end="")

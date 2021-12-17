@@ -35,7 +35,7 @@ def downloadClips(startTimestamps: list, runtimeTimestamps: list, links: list):
 						outbuff = bytearray()
 					else:
 						outbuff += dlProcOutput
-				print(outbuff.decode('utf-8'))
+				print(outbuff.decode('utf-8'), end='')
 			return (len(startTimestamps))
 		else:
 			print('[DOWNLOADER]: BiliBili downloading not yet implemented')

@@ -1,4 +1,5 @@
 from yt_dlp import *
+import os
 
 def getAVUrls(videoLink: str):
 	info = YoutubeDL({'quiet': True, 'no_warnings': True}).extract_info(videoLink, download=False)
@@ -122,4 +123,11 @@ def parseTimestamps(timestampsInput: str, numVideoLinks: int):
 		return startStamps, runtimeStamps
 
 def cleanup():
+	tempdirFiles = [f for f in os.listdir('./vcdl_temp') if os.path.isfile(os.path.join('./vcdl_temp', f))]
+
+	print('[CLEANUP]: Clearing temp directory...')
+	for file in tempdirFiles:
+		print(f"[CLEANUP]: Removing file - {file}\r", end='')
+		os.remove(f"./vcdl_temp/{file}")
 	print()
+	os.rmdir('./vcdl_temp')
