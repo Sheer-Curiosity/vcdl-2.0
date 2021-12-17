@@ -11,6 +11,7 @@ from utils.info import *
 
 import argparse
 import os
+import sys
 
 isDev = False
 if os.path.isdir('./.git'):
@@ -20,6 +21,7 @@ argParser = argparse.ArgumentParser()
 argParser.add_argument('-v', '--video-links', nargs='*')
 argParser.add_argument('-ts', '--timestamps')
 argParser.add_argument('-o', '--output-title', default='output')
+argParser.add_argument('-p', '--padding', type=int, default=5, choices=range(1, 31))
 argParser.add_argument('--debug', action='store_true')
 args = argParser.parse_args()
 
@@ -32,9 +34,14 @@ def runClipper(video_links: list, timestamps: str):
 	for i in video_links:
 		urlLinks.append(getAVUrls(i))
 	
-	startTs, runtimeTs = parseTimestamps(timestamps, len(urlLinks))
+	startTs, runtimeTs = parseTimestamps(timestamps, len(urlLinks), args.padding )
 	numClips = downloadClips(startTs, runtimeTs, urlLinks)
-	mergeClips(numClips, args.output_title)
+	if numClips > 1:
+		mergeClips(numClips, args.output_title)
+	else:
+		if os.path.exists(f"./{args.output_title}.mp4"):
+			os.remove(f"./{args.output_title}.mp4")
+		os.rename('./vcdl_temp/clip1.mp4', f"./{args.output_title}.mp4")
 	cleanup()
 
 if args.debug:

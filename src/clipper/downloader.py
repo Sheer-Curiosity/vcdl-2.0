@@ -1,9 +1,9 @@
 import ffmpeg
 import os
-import subprocess
 
 def downloadClips(startTimestamps: list, runtimeTimestamps: list, links: list):
 	if len(links) > 1:
+		# TODO
 		print('[DOWNLOADER]: Funtionality not yet implemented')
 		exit()
 	else:
@@ -38,6 +38,7 @@ def downloadClips(startTimestamps: list, runtimeTimestamps: list, links: list):
 				print(outbuff.decode('utf-8'), end='')
 			return (len(startTimestamps))
 		else:
+			# TODO
 			print('[DOWNLOADER]: BiliBili downloading not yet implemented')
 			exit()
 		

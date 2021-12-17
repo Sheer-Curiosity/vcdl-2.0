@@ -1,6 +1,6 @@
 import git
 
-__version = 'DEV-0.2.3'
+__version = 'DEV-0.2.4'
 
 def versionInfo(isDev: bool):
 	if isDev:
@@ -16,7 +16,7 @@ def generalInfo():
 Tested By: Sheer Curiosity, Chimatta
 Quote Of The Version:
   "I wrote most of this program in
-  24 hours over the span of 2 days,
+  24 hours over the span of 3 days,
   powered by nothing but eurobeat
   and determination."
   - Sheer Curiosity\n

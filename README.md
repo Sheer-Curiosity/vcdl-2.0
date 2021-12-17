@@ -9,6 +9,8 @@ A python rewrite of a clipping program. IN PROGRESS
 - ~~clip downloading~~
 - ~~clip stitching~~
 - ~~output renaming~~
+- ~~single timestamp downloading~~
+- add ffmpeg auto-install / configure
 
 ## New Features TODO:
 
