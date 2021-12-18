@@ -1,4 +1,3 @@
-from platform import platform
 from src.utils.info import __version
 
 import os
