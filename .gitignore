@@ -129,5 +129,6 @@ dmypy.json
 .pyre/
 
 # Stuff that shouldn't be on github
+/src/bin/ffmpeg
 /testing stuff
 cookies.txt

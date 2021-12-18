@@ -10,7 +10,7 @@ A python rewrite of a clipping program. IN PROGRESS
 - ~~clip stitching~~
 - ~~output renaming~~
 - ~~single timestamp downloading~~
-- add ffmpeg auto-install / configure
+- ~~add ffmpeg auto-install / configure~~
 
 ## New Features TODO:
 

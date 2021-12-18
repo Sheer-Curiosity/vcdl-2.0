@@ -5,24 +5,24 @@
 # Reluctantly written by Sheer Curiosity
 
 from clipper.merger import mergeClips
-from clipper.utils import *
+from clipper.extractor import getAVUrls
 from clipper.downloader import *
+from clipper.misc import *
 from utils.info import *
+from utils.misc import *
 
 import argparse
 import os
-import sys
 
-isDev = False
-if os.path.isdir('./.git'):
-	isDev = True
+ffmpeg_path = resource_path('bin/ffmpeg/ffmpeg', os.path.abspath(__file__))
 
 argParser = argparse.ArgumentParser()
 argParser.add_argument('-v', '--video-links', nargs='*')
 argParser.add_argument('-ts', '--timestamps')
 argParser.add_argument('-o', '--output-title', default='output')
-argParser.add_argument('-p', '--padding', type=int, default=5, choices=range(1, 31))
-argParser.add_argument('--debug', action='store_true')
+argParser.add_argument('-p', '--padding', default=5, type=int, choices=range(0, 31), metavar='[0-30]')
+argParser.add_argument('-ext', '--output-file-extension', default='mp4', type=str, choices=['mp4', 'mkv'], metavar='[mp4, mkv]')
+argParser.add_argument('--debug', action='store_true', help='prints more detailed information for debugging')
 args = argParser.parse_args()
 
 def runClipper(video_links: list, timestamps: str):
@@ -35,9 +35,9 @@ def runClipper(video_links: list, timestamps: str):
 		urlLinks.append(getAVUrls(i))
 	
 	startTs, runtimeTs = parseTimestamps(timestamps, len(urlLinks), args.padding )
-	numClips = downloadClips(startTs, runtimeTs, urlLinks)
+	numClips = downloadClips(startTs, runtimeTs, urlLinks, ffmpeg_path)
 	if numClips > 1:
-		mergeClips(numClips, args.output_title)
+		mergeClips(numClips, args.output_title, ffmpeg_path)
 	else:
 		if os.path.exists(f"./{args.output_title}.mp4"):
 			os.remove(f"./{args.output_title}.mp4")
@@ -45,7 +45,7 @@ def runClipper(video_links: list, timestamps: str):
 	cleanup()
 
 if args.debug:
-	print(versionInfo(isDev), end="")
+	print(versionInfo(), end="")
 
 if args.video_links != None and args.timestamps != None:
 	if args.debug:

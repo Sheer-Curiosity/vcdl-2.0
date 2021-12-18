@@ -1,14 +1,7 @@
-import git
+__version = 'DEV-0.2.8'
 
-__version = 'DEV-0.2.4'
-
-def versionInfo(isDev: bool):
-	if isDev:
-		repo = git.Repo(search_parent_directories=True)
-		sha = repo.head.object.hexsha
-		return (f"[DEBUG]: Current Major Version: {__version}\n[DEBUG]: Git Commit SHA: {sha}\n")
-	else:
-		return (f"[DEBUG]: Current Major Version: {__version}\n")
+def versionInfo():
+	return (f"[DEBUG]: Current Major Version: {__version}\n")
 
 def generalInfo():
 	return(
