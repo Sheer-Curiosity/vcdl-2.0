@@ -1,0 +1,10 @@
+{
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": ".*",
+                "cmd": "python ./devscripts/update_version.py"
+            }
+        ]
+    }
+}

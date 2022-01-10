@@ -1,7 +1,5 @@
-__version = 'DEV-0.2.8'
-
 def versionInfo():
-	return (f"[DEBUG]: Current Major Version: {__version}\n")
+	return (f"[DEBUG]: Current Version: {read_version()}\n")
 
 def generalInfo():
 	return(
@@ -14,3 +12,7 @@ Quote Of The Version:
   and determination."
   - Sheer Curiosity\n
 	''')
+
+def read_version():
+    exec(compile(open('src/version.py').read(), 'src/version.py', 'exec'))
+    return locals()['__version__']

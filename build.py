@@ -1,4 +1,4 @@
-from src.utils.info import __version
+from src.version import __version__
 
 import os
 import PyInstaller.__main__
@@ -56,5 +56,5 @@ PyInstaller.__main__.run([
 	'./src/main.py',
 	'--add-data', './src/bin/ffmpeg/ffmpeg.exe;./bin/ffmpeg/',
 	'--onefile',
-	'-n', f"vcdl_{__version}",
+	'-n', f"vcdl_{__version__}",
 ])

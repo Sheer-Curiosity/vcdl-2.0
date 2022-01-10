@@ -50,16 +50,9 @@ def calculatePadding(timestampPair: str, paddingInt: int):
 # There is 100% a better way to do some of the logic in this function, but I really really do not care.
 def parseTimestamps(timestampsInput: str, numVideoLinks: int, timePadding: int):
 	initSplitList = timestampsInput.split(',')
-	idList = []
 	tsList = []
 	if numVideoLinks > 1:
-		for i in initSplitList:
-			splitIdAndTs = i.split(':', 1)
-			idList.append(splitIdAndTs[0])
-			tsList.append(splitIdAndTs[1].strip('[]'))
-		if int(max(idList)) != numVideoLinks-1:
-			print(f"ERROR: Timestamp ID {max(idList)} out of range")
-			quit()
+		quit()
 	else:
 		paddedTs = []
 		for i in initSplitList:
