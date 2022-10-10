@@ -1,4 +1,5 @@
 import os
+import zipfile
 
 def formatTimestamp(inputTimestamp: list):
 	tempTimestamp = inputTimestamp
@@ -105,3 +106,8 @@ def cleanup():
 		os.remove(f"./vcdl_temp/{file}")
 	print()
 	os.rmdir('./vcdl_temp')
+
+def packupClips(output):
+	with zipfile.ZipFile(f"./{output}.zip", 'w') as zipObj:
+		for f in os.listdir('./vcdl_temp'):
+			zipObj.write(os.path.join('./vcdl_temp', f), os.path.join('.', f))

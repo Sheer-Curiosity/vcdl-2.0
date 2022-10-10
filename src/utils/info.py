@@ -1,10 +1,12 @@
+import os
+
 def versionInfo():
 	return (f"[DEBUG]: Current Version: {read_version()}\n")
 
 def generalInfo():
 	return(
 	'''Written By: Sheer Curiosity
-Tested By: Sheer Curiosity, Chimatta
+Tested By: Sheer Curiosity, Members of HoloRes Translations
 Quote Of The Version:
   "I wrote most of this program in
   24 hours over the span of 3 days,
