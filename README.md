@@ -1,16 +1,10 @@
-# vcdl2
-A python rewrite of a clipping program. IN PROGRESS
+# VCDL2
+A Python rewrite of the original VCDL/HoloClipper PowerShell script.
 
-# Current Progress to Base Functionality: 100%
+VCDL2 retains much of the functionality of the original script. As with the original, it was purpose-written to specifications outlined by the HoloResort Translations team, however the program is open for all to use.
 
-## Base Functionality TODO:
-- ~~Link fetching for YouTube and BiliBili~~
-- ~~Timestamp processing for single videos~~
-- ~~clip downloading~~
-- ~~clip stitching~~
-- ~~output renaming~~
-- ~~single timestamp downloading~~
-- ~~add ffmpeg auto-install / configure~~
+## Installation
+At the moment, VCDL2 is still in active development, and has no prebuilt binaries. However, you can build the program yourself using the `build.py` script. The program only has support for Windows builds at the moment. Linux support will come in future updates.
 
 ## New Features TODO:
 
@@ -22,7 +16,6 @@ A python rewrite of a clipping program. IN PROGRESS
 
 ### Medium Priority
 
-- Allow passing cookies to yt-dlp for downloading YouTube member-only or private videos
 - Integrated batch downloading
 - Wider video site support
 
