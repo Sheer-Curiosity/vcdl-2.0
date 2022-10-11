@@ -132,3 +132,4 @@ dmypy.json
 /src/bin/ffmpeg
 /testing stuff
 cookies.txt
+.vscode/settings.json

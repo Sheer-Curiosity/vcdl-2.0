@@ -3,7 +3,7 @@
         "commands": [
             {
                 "match": ".*",
-                "cmd": "python ./devscripts/update_version.py"
+                "cmd": "py ./devscripts/update_version.py"
             }
         ]
     }

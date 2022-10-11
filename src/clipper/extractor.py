@@ -1,4 +1,5 @@
 from yt_dlp import *
+import sys
 
 class MyLogger:
 	def debug(self, msg):
@@ -16,12 +17,12 @@ class MyLogger:
 	def error(self, msg):
 		print(f"[EXTRACTOR]: {msg}")
 
-def getAVUrls(videoLink: str):
+def getAVUrls(videoLink: str, cookieFile: str):
 	info = dict
 	try:
-		info = YoutubeDL({'quiet': True, 'no_warnings': True, 'logger': MyLogger(),}).extract_info(videoLink, download=False)
+		info = YoutubeDL({'quiet': True, 'no_warnings': True, 'logger': MyLogger(), 'cookiefile': cookieFile}).extract_info(videoLink, download=False)
 	except:
-		exit()
+		sys.exit()
 
 	print(f"[EXTRACTOR]: Identified link as {info['extractor']}")
 

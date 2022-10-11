@@ -13,6 +13,7 @@ from utils.misc import *
 
 import argparse
 import os
+import sys
 
 ffmpeg_path = resource_path('bin/ffmpeg/ffmpeg', os.path.abspath(__file__))
 
@@ -24,6 +25,7 @@ argParser.add_argument('-p', '--padding', default=5, type=int, choices=range(0, 
 argParser.add_argument('-ext', '--output-file-extension', default='mp4', type=str, choices=['mp4', 'mkv'], metavar='[mp4, mkv]')
 argParser.add_argument('-m', '--merge', action='store_true', help='merge clips into one video file')
 argParser.add_argument('--debug', action='store_true', help='print more detailed information for debugging')
+argParser.add_argument('--cookiefile', default=None)
 args = argParser.parse_args()
 
 def runClipper(video_links: list, timestamps: str):
@@ -31,9 +33,9 @@ def runClipper(video_links: list, timestamps: str):
 
 	if len(video_links) > 1:
 		print('[EXTRACTOR]: Multi-link functionality not yet implemented')
-		exit()
+		sys.exit()
 	for i in video_links:
-		urlLinks.append(getAVUrls(i))
+		urlLinks.append(getAVUrls(i, args.cookiefile))
 	
 	startTs, runtimeTs = parseTimestamps(timestamps, len(urlLinks), args.padding )
 

@@ -1,4 +1,5 @@
 import os
+import sys
 import zipfile
 
 def formatTimestamp(inputTimestamp: list):
@@ -53,7 +54,7 @@ def parseTimestamps(timestampsInput: str, numVideoLinks: int, timePadding: int):
 	initSplitList = timestampsInput.split(',')
 	tsList = []
 	if numVideoLinks > 1:
-		quit()
+		sys.exit()
 	else:
 		paddedTs = []
 		for i in initSplitList:
