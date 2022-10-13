@@ -21,13 +21,14 @@ print(ffmpeg_path)
 
 argParser = argparse.ArgumentParser(prog='tool', formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=120), usage="vcdl2 -v [VIDEO LINKS] -ts [TIMESTAMPS] [options]")
 argParser.add_argument('-v', '--video-links', nargs='*', help='link(s) to download from')
-argParser.add_argument('-ts', '--timestamps', nargs='*', help='timestamp set string. see documentation for formatting guide')
+argParser.add_argument('-ts', '--timestamps', nargs='*', help='timestamp set(s). see documentation for formatting guide')
 argParser.add_argument('-ot', '--output-title', default='output', help='name of outputted video file or zip archive')
-argParser.add_argument('-ext', '--output-extension', default='mp4', type=str, choices=['mp4', 'mkv'], metavar='[mp4, mkv]')
 argParser.add_argument('-p', '--padding', default=5, type=int, choices=range(0, 31), metavar='[0-30]', help='see documentation')
 argParser.add_argument('-dm', '--download-method', default='DPAMRE', type=str, choices=['DPAMRE', 'DWACFF'], metavar='[DPAMRE, DWACFF]', help='see documentation')
-argParser.add_argument('-m', '--merge-clips', action='store_true', help='merge clips into one video file')
-argParser.add_argument('-cf', '--cookiefile', default=None, help='pass a Netscape cookie file to download private and members only videos')
+out_type = argParser.add_mutually_exclusive_group()
+out_type.add_argument('-m', '--merge-clips', action='store_true', help='merge clips into one video file')
+out_type.add_argument('-arc', '--output-archive', action='store_true', help='outputs all clips to a single zip file')
+argParser.add_argument('-cf', '--cookiefile', default=None, help='Netscape cookie file for downloading private and members only videos')
 argParser.add_argument('--debug', action='store_true', help='print more detailed runtime information for debugging')
 args = argParser.parse_args()
 
@@ -54,12 +55,17 @@ def runClipper(video_links: list, timestamps: list):
 	if clip_dict > 1:
 		if args.merge_clips:
 			mergeClips(args.debug, clip_dict, args.output_title, ffmpeg_path, tempdir_parent_path)
-		else:
+		elif args.output_archive:
+			compat_convert(tempdir_parent_path, ffmpeg_path)
 			packupClips(args.output_title)
+		else:
+			for f in os.listdir(f"{tempdir_parent_path}/vcdl_temp"):
+				if f.startswith('clip'):
+					os.rename(os.path.join(f"{tempdir_parent_path}/vcdl_temp", f), os.path.join('./', f"{args.output_title}-{f}"))
 	else:
 		if os.path.exists(f"./{args.output_title}.mp4"):
 			os.remove(f"./{args.output_title}.mp4")
-		os.rename(f"{tempdir_parent_path}/vcdl_temp/clip1.mp4", f"./{args.output_title}.mp4")
+		output_convert(args.output_title, tempdir_parent_path, ffmpeg_path)
 	cleanup()
 
 def main():

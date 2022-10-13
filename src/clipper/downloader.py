@@ -53,7 +53,7 @@ def downloadClips(debug: bool, timestamps: list, links: list, ffmpeg_path: str, 
 						downloadProc = (
 							ffmpeg
 							.output(videoInput, audioInput, f"{tempdir_parent_path}/vcdl_temp/clip{idx+1}.mp4", vcodec=vcodec, acodec='copy')
-							.global_args('-hide_banner', '-loglevel', 'quiet', '-stats', '-y', '-crf', '18')
+							.global_args('-hide_banner', '-loglevel', 'fatal', '-stats', '-y', '-crf', '18')
 							.run_async(cmd=ffmpeg_path, quiet=True)
 						)
 					outbuff = bytearray()

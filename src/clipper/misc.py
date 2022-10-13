@@ -1,3 +1,4 @@
+import ffmpeg
 import os
 import sys
 import zipfile
@@ -105,7 +106,59 @@ def cleanup():
 	print()
 	os.rmdir('./vcdl_temp')
 
-def packupClips(output):
-	with zipfile.ZipFile(f"./{output}.zip", 'w') as zipObj:
+def packupClips(output_title: str):
+	print('[CLEANUP]: Packing clips into zip archive...')
+	with zipfile.ZipFile(f"./{output_title}.zip", 'w') as zipObj:
 		for f in os.listdir('./vcdl_temp'):
-			zipObj.write(os.path.join('./vcdl_temp', f), os.path.join('.', f))
+			if f.startswith('clip'):
+				zipObj.write(os.path.join('./vcdl_temp', f), os.path.join('.', f))
+
+def output_convert(output_title: str, tempdir_parent_path: str, ffmpeg_path: str):
+	print('[CLEANUP]: Converting output file...')
+	clip = ffmpeg.input(f"{tempdir_parent_path}/vcdl_temp/clip1.mp4")
+	convProc = (
+		ffmpeg
+		.output(clip, f"./{output_title}.mp4", vcodec='libx264', acodec='copy')
+		.global_args('-hide_banner', '-loglevel', 'quiet', '-stats', '-y', '-crf', '16')
+		.run_async(cmd=ffmpeg_path, quiet=True)
+	)
+	outbuff = bytearray()
+	while True:
+		convProcOutput = convProc.stderr.read(1)
+		if convProcOutput == b'' and convProc.poll() is not None:
+			break
+		if convProcOutput == b'\r':
+			outbuff += convProcOutput
+			print(f"[FFMPEG]: {outbuff.decode('utf-8')}", end='')
+			outbuff = bytearray()
+		else:
+			outbuff += convProcOutput
+	print(f"[FFMPEG]: {outbuff.decode('utf-8')}", end='')
+
+def compat_convert(tempdir_parent_path: str, ffmpeg_path: str):
+	for idx, f in enumerate(os.listdir(f"{tempdir_parent_path}/vcdl_temp")):
+		if f.startswith('clip'):
+			print(f"[CLEANUP]: Converting clip {idx+1}...")
+			src = open(os.path.join(f"{tempdir_parent_path}/vcdl_temp", f), 'rb').read()
+			open(os.path.join(f"{tempdir_parent_path}/vcdl_temp", f"TEMP_{f}"), 'wb').write(src)
+			clip = ffmpeg.input(os.path.join(f"{tempdir_parent_path}/vcdl_temp", f"TEMP_{f}"))
+			convProc = (
+				ffmpeg
+				.output(clip, os.path.join(f"{tempdir_parent_path}/vcdl_temp", f), vcodec='libx264', acodec='copy')
+				.global_args('-hide_banner', '-loglevel', 'quiet', '-stats', '-y', '-crf', '16')
+				.run_async(cmd=ffmpeg_path, quiet=True)
+			)
+			outbuff = bytearray()
+			while True:
+				convProcOutput = convProc.stderr.read(1)
+				if convProcOutput == b'' and convProc.poll() is not None:
+					break
+				if convProcOutput == b'\r':
+					outbuff += convProcOutput
+					print(f"[FFMPEG]: {outbuff.decode('utf-8')}", end='')
+					outbuff = bytearray()
+				else:
+					outbuff += convProcOutput
+			print(f"[FFMPEG]: {outbuff.decode('utf-8')}", end='')
+			os.remove(os.path.join(f"{tempdir_parent_path}/vcdl_temp", f"TEMP_{f}"))
+
