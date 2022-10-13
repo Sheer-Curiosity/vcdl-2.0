@@ -50,7 +50,7 @@ def calculatePadding(timestampPair: str, paddingInt: int):
 	return[startTs, endTs]
 
 # There is 100% a better way to do some of the logic in this function, but I really really do not care.
-def parseTimestamps(timestampsInput: str, timePadding: int):
+def parseTimestamps(debug: bool, timestampsInput: str, timePadding: int):
 	initSplitList = timestampsInput.split(',')
 	tsList = []
 	paddedTs = []

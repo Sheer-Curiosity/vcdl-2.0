@@ -14,15 +14,8 @@ import zipfile
 __buildpath__ = os.path.abspath('.')
 print(__buildpath__)
 
-linux_ffmpeg = 'https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz'
-linux_ffmpeg_md5 = requests.get('https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz.md5').content.decode()[0:32]
-
-# This is where Windows ffmpeg builds are hosted at the time of writing.
-# In case this link breaks, just replace it with one to a rehost.
-# Needs to be a mirror of the gyan.dev files, or else some modifications may be needed
-# to this script to get it to pull the right files from the download.
-win32_ffmpeg = 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'
-win32_ffmpeg_sha256 = requests.get('https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip.sha256').content.decode()
+# Damn you AV1
+win32_ffmpeg = 'https://github.com/GyanD/codexffmpeg/releases/download/5.1.2/ffmpeg-5.1.2-full_build.zip'
 
 argParser = argparse.ArgumentParser()
 group = argParser.add_mutually_exclusive_group()
@@ -37,87 +30,17 @@ if args.dev == False and args.rel == False:
 if sys.platform == 'linux':
 	if not os.path.isdir('./src/bin/linux/ffmpeg/'):
 		os.makedirs('./src/bin/linux/ffmpeg/')
-	if not os.path.isfile('./ffmpeg-download.tar.xz'):
-			print('[BUILD]: Downloading ffmpeg binaries (tar.xz archive)...')
-			ffmpeg_dl = requests.get(linux_ffmpeg, allow_redirects=True)
-			ffmpeg_dl_md5 = hashlib.md5(ffmpeg_dl.content).hexdigest()
-			if ffmpeg_dl_md5 == linux_ffmpeg_md5:
-				print('[BUILD]: Verified integrity of downloaded file')
-				open('./ffmpeg-download.tar.xz', 'wb').write(ffmpeg_dl.content)
-			else:
-				print('[ERROR]: Could not verify integrity of downloaded file. Stopping build...')
-				print('[INFO]: This is usually caused by a corrupted download. Retrying the build will typically\n[INFO]: fix the issue.')
-				sys.exit()
-	with tarfile.open('./ffmpeg-download.tar.xz', 'r:xz') as tarfileObj:
-		for file in tarfileObj.getmembers():
-			if file.name.endswith('ffmpeg'):
-				if not os.path.isfile('./src/bin/linux/ffmpeg/ffmpeg'):
-					print('[BUILD]: ffmpeg not found, retrieving...')
-					open('./src/bin/linux/ffmpeg/ffmpeg', 'wb').write(tarfileObj.extractfile(file.name).read())
-				else:
-					print('[BUILD]: Exisiting ffmpeg file found, comparing file hashes...')
-					existing_file_sha256 = hashlib.sha256()
-					with open('./src/bin/linux/ffmpeg/ffmpeg', 'rb') as f:
-						# Read and update hash string value in blocks of 4K
-						for byte_block in iter(lambda: f.read(4096),b""):
-							existing_file_sha256.update(byte_block)
-					downloaded_file_sha256 = hashlib.sha256()
-					with tarfileObj.extractfile(file.name) as s:
-						for byte_block in iter(lambda: s.read(4096),b""):
-							downloaded_file_sha256.update(byte_block)
-					if (existing_file_sha256.hexdigest() != downloaded_file_sha256.hexdigest()):
-						print('[BUILD]: File hashes do not match!\n[BUILD]: This usually means the downloaded file is of a newer version than the existing one.\n[BUILD]: Do you wish to replace the existing ffmpeg file with the downloaded one? [Y/n]: ', end='')
-						ans = input()
-						if re.search("[yY]", ans) or ans == '':
-							print('[BUILD]: Using downloaded ffmpeg file')
-							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
-						elif re.search("[nN]", ans):
-							print('[BUILD]: Using existing ffmpeg file')
-							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
-						else:
-							print('[BUILD]: Unknown Input, assuming \"N\"')
-							print('[BUILD]: Using existing ffmpeg file')
-							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
-					else:
-						print('[BUILD]: File hashes match')
-			if file.name.endswith('ffprobe'):
-				if not os.path.isfile('./src/bin/linux/ffmpeg/ffprobe'):
-					print('[BUILD]: ffprobe not found, retrieving...')
-					open('./src/bin/linux/ffmpeg/ffprobe', 'wb').write(tarfileObj.extractfile(file.name).read())
-				else:
-					print('[BUILD]: Exisiting ffprobe file found, comparing file hashes...')
-					existing_file_sha256 = hashlib.sha256()
-					with open('./src/bin/linux/ffmpeg/ffprobe', 'rb') as f:
-						# Read and update hash string value in blocks of 4K
-						for byte_block in iter(lambda: f.read(4096),b""):
-							existing_file_sha256.update(byte_block)
-					downloaded_file_sha256 = hashlib.sha256()
-					with tarfileObj.extractfile(file.name) as s:
-						for byte_block in iter(lambda: s.read(4096),b""):
-							downloaded_file_sha256.update(byte_block)
-					if (existing_file_sha256.hexdigest() != downloaded_file_sha256.hexdigest()):
-						print('[BUILD]: File hashes do not match!\n[BUILD]: This usually means the downloaded file is of a newer version than the existing one.\n[BUILD]: Do you wish to replace the existing ffprobe file with the downloaded one? [Y/n]: ', end='')
-						ans = input()
-						if re.search("[yY]", ans) or ans == '':
-							print('[BUILD]: Using downloaded ffprobe file')
-							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
-						elif re.search("[nN]", ans):
-							print('[BUILD]: Using existing ffprobe file')
-							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
-						else:
-							print('[BUILD]: Unknown Input, assuming \"N\"')
-							print('[BUILD]: Using existing ffprobe file')
-							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
-					else:
-						print('[BUILD]: File hashes match')
-	if os.path.isfile('./ffmpeg-download.tar.xz'):
-		# Remove downloaded TAR file after extraction
-		os.remove('./ffmpeg-download.tar.xz')
+	if not os.path.isfile('./src/bin/linux/ffmpeg/ffmpeg'):
+		print('[BUILD/WARNING]: ffmpeg executable not found!')
+		print('[BUILD/WARNING]: To build on linux, you MUST build ffmpeg yourself (https://trac.ffmpeg.org/wiki/CompilationGuide).')
+		print('[BUILD/WARNING]: or find a static build with "--enable-libsvtav1"')
+		print('[BUILD/WARNING]: Once finished, place the executable in the "src/bin/linux/ffmpeg" folder.')
+		sys.exit()
 	
 	if args.dev == True:
 		PyInstaller.__main__.run([
 			f"{__buildpath__}/src/main.py",
-			'--add-data', f"{__buildpath__}/src/bin/linux/ffmpeg/ffmpeg:./bin/linux/ffmpeg/",
+			'--add-data', f"{__buildpath__}/src/bin/linux/ffmpeg/ffmpeg:./bin/ffmpeg/",
 			'--specpath', f"{__buildpath__}/build/linux/development/spec/",
 			'--distpath', f"{__buildpath__}/build/linux/development/bin/",
 			'--workpath', f"{__buildpath__}/build/linux/development/",
@@ -127,7 +50,7 @@ if sys.platform == 'linux':
 	if args.rel == True:
 		PyInstaller.__main__.run([
 			f"{__buildpath__}/src/main.py",
-			'--add-data', f"{__buildpath__}/src/bin/linux/ffmpeg/ffmpeg:./bin/linux/ffmpeg/",
+			'--add-data', f"{__buildpath__}/src/bin/linux/ffmpeg/ffmpeg:./bin/ffmpeg/",
 			'--specpath', f"{__buildpath__}/build/linux/release/spec/",
 			'--distpath', f"{__buildpath__}/build/linux/release/bin/",
 			'--workpath', f"{__buildpath__}/build/linux/release/",
@@ -143,14 +66,7 @@ elif sys.platform == 'win32':
 		# TODO: Add option to force redownload
 		print('[BUILD]: Downloading ffmpeg binaries (zip archive)...')
 		ffmpeg_dl = requests.get(win32_ffmpeg, allow_redirects=True)
-		ffmpeg_dl_sha256 = hashlib.sha256(ffmpeg_dl.content).hexdigest()
-		if ffmpeg_dl_sha256 == win32_ffmpeg_sha256:
-			print('[BUILD]: Verified integrity of downloaded file')
-			open('./ffmpeg-download.zip', 'wb').write(ffmpeg_dl.content)
-		else:
-			print('[ERROR]: Could not verify integrity of downloaded file. Stopping build...')
-			print('[INFO]: This is usually caused by a corrupted download. Retrying the build will typically\n[INFO]: fix the issue.')
-			sys.exit()
+		open('./ffmpeg-download.zip', 'wb').write(ffmpeg_dl.content)
 	with zipfile.ZipFile('./ffmpeg-download.zip', 'r') as zipObj:
 		for fileName in zipObj.namelist():
 			if fileName.endswith('ffmpeg.exe'):
@@ -220,7 +136,7 @@ elif sys.platform == 'win32':
 	if args.dev == True:
 		PyInstaller.__main__.run([
 			f"{__buildpath__}/src/main.py",
-			'--add-data', f"{__buildpath__}/src/bin/win32/ffmpeg/ffmpeg.exe;./bin/win32/ffmpeg/",
+			'--add-data', f"{__buildpath__}/src/bin/win32/ffmpeg/ffmpeg.exe;./bin/ffmpeg/",
 			'--onefile',
 			'--specpath', f"{__buildpath__}/build/win32/development/spec/",
 			'--distpath', f"{__buildpath__}/build/win32/development/bin/",
@@ -230,7 +146,7 @@ elif sys.platform == 'win32':
 	if args.rel == True:
 		PyInstaller.__main__.run([
 			f"{__buildpath__}/src/main.py",
-			'--add-data', f"{__buildpath__}/src/bin/win32/ffmpeg/ffmpeg.exe;./bin/win32/ffmpeg/",
+			'--add-data', f"{__buildpath__}/src/bin/win32/ffmpeg/ffmpeg.exe;./bin/ffmpeg/",
 			'--onefile',
 			'--specpath', f"{__buildpath__}/build/win32/release/spec/",
 			'--distpath', f"{__buildpath__}/build/win32/release/bin/",

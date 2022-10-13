@@ -15,18 +15,18 @@ import argparse
 import os
 import sys
 
-if sys.platform == 'win32':
-	ffmpeg_path = resource_path('bin/win32/ffmpeg/ffmpeg', os.path.abspath(__file__))
-if sys.platform == 'linux':
-	ffmpeg_path = resource_path('bin/linux/ffmpeg/ffmpeg', os.path.abspath(__file__))
+ffmpeg_path = resource_path('bin/ffmpeg/ffmpeg', os.path.abspath(__file__))
+tempdir_parent_path = '.'
+print(ffmpeg_path)
 
 argParser = argparse.ArgumentParser(prog='tool', formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=120), usage="vcdl2 -v [VIDEO LINKS] -ts [TIMESTAMPS] [options]")
 argParser.add_argument('-v', '--video-links', nargs='*', help='link(s) to download from')
-argParser.add_argument('-ts', '--timestamps', nargs='*', help='timestamp set string. see github documentation for formatting guide')
-argParser.add_argument('-o', '--output-title', default='output', help='name of outputted video file or zip archive')
-argParser.add_argument('-p', '--padding', default=5, type=int, choices=range(0, 31), metavar='[0-30]', help='see github documentation')
+argParser.add_argument('-ts', '--timestamps', nargs='*', help='timestamp set string. see documentation for formatting guide')
+argParser.add_argument('-ot', '--output-title', default='output', help='name of outputted video file or zip archive')
 argParser.add_argument('-ext', '--output-extension', default='mp4', type=str, choices=['mp4', 'mkv'], metavar='[mp4, mkv]')
-argParser.add_argument('-m', '--merge', action='store_true', help='merge clips into one video file')
+argParser.add_argument('-p', '--padding', default=5, type=int, choices=range(0, 31), metavar='[0-30]', help='see documentation')
+argParser.add_argument('-dm', '--download-method', default='DPAMRE', type=str, choices=['DPAMRE', 'DWACFF'], metavar='[DPAMRE, DWACFF]', help='see documentation')
+argParser.add_argument('-m', '--merge-clips', action='store_true', help='merge clips into one video file')
 argParser.add_argument('-cf', '--cookiefile', default=None, help='pass a Netscape cookie file to download private and members only videos')
 argParser.add_argument('--debug', action='store_true', help='print more detailed runtime information for debugging')
 args = argParser.parse_args()
@@ -39,27 +39,27 @@ def runClipper(video_links: list, timestamps: list):
 	urlLinks = []
 	timestampSets = []
 
-	if len(video_links) > 1 or len():
-		print('[EXTRACTOR]: Multi-link functionality not yet implemented')
+	if len(video_links) > 1 or len(timestamps) > 1:
+		print('[ERROR]: Multi-link functionality not yet implemented')
 		sys.exit()
 	
 	for link in video_links:
-		urlLinks.append(getAVUrls(link, args.cookiefile))
+		urlLinks.append(getAVUrls(args.debug, link, args.cookiefile))
 	
 	for set in timestamps:
-		timestampSets.append(parseTimestamps(set, args.padding))
+		timestampSets.append(parseTimestamps(args.debug, set, args.padding))
 
-	clipDict = downloadClips(timestampSets, urlLinks, ffmpeg_path)
+	clip_dict = downloadClips(args.debug, timestampSets, urlLinks, ffmpeg_path, tempdir_parent_path, args.download_method)
 
-	if clipDict > 1:
-		if args.merge:
-			mergeClips(clipDict, args.output_title, ffmpeg_path)
+	if clip_dict > 1:
+		if args.merge_clips:
+			mergeClips(args.debug, clip_dict, args.output_title, ffmpeg_path, tempdir_parent_path)
 		else:
 			packupClips(args.output_title)
 	else:
 		if os.path.exists(f"./{args.output_title}.mp4"):
 			os.remove(f"./{args.output_title}.mp4")
-		os.rename('./vcdl_temp/clip1.mp4', f"./{args.output_title}.mp4")
+		os.rename(f"{tempdir_parent_path}/vcdl_temp/clip1.mp4", f"./{args.output_title}.mp4")
 	cleanup()
 
 def main():
@@ -67,12 +67,14 @@ def main():
 		if args.video_links != None and args.timestamps != None:
 			if args.debug:
 				print(f"[DEBUG]: Inputted Video Link(s): {args.video_links}")
-				print(f"[DEBUG]: Inputted Timestamps: {args.timestamps}")
+				print(f"[DEBUG]: Inputted Timestamp Set(s): {args.timestamps}")
 			runClipper(args.video_links, args.timestamps)
 		else:
 			argParser.print_help()
 	except KeyboardInterrupt:
+		print("\033[K", end="\r")
 		print("[INFO]: Keyboard Interrupt recieved, exiting program...")
+		cleanup()
 	sys.exit(0)
 
 if __name__ == '__main__':

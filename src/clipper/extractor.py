@@ -1,4 +1,5 @@
 from yt_dlp import *
+import re
 import sys
 
 class MyLogger:
@@ -17,7 +18,7 @@ class MyLogger:
 	def error(self, msg):
 		print(f"[EXTRACTOR]: {msg}")
 
-def getAVUrls(videoLink: str, cookieFile: str):
+def getAVUrls(debug: bool, videoLink: str, cookieFile: str):
 	info = dict
 	try:
 		info = YoutubeDL({'quiet': True, 'no_warnings': True, 'logger': MyLogger(), 'cookiefile': cookieFile}).extract_info(videoLink, download=False)
@@ -29,8 +30,9 @@ def getAVUrls(videoLink: str, cookieFile: str):
 	if info['extractor'] == 'youtube':
 		
 		formats = info['formats'][::-1]
-		best_video = next(f for f in formats if f['vcodec'] != 'none' and f['acodec'] == 'none' and f['ext'] == 'mp4')
-		best_audio = next(f for f in formats if f['acodec'] != 'none' and f['vcodec'] == 'none' and f['ext'] == 'm4a')
+		
+		best_video = next(f for f in formats if f['vcodec'].startswith('av01') and f['ext'] == 'mp4')
+		best_audio = next(f for f in formats if f['acodec'].startswith('mp4a') and f['ext'] == 'm4a')
 
 		return[best_video['url'], best_audio['url']]
 	elif info['extractor'] == 'BiliBili':

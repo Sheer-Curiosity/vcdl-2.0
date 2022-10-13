@@ -134,3 +134,5 @@ dmypy.json
 /src/bin/win32
 /testing stuff
 cookies.txt
+output.mp4
+output.zip
