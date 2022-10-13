@@ -40,7 +40,10 @@ def downloadClips(debug: bool, timestamps: list, links: list, ffmpeg_path: str, 
 					print(f"[DOWNLOADER]: Downloading clip {idx+1}...")
 					videoInput = ffmpeg.input(links[0][0], ss=stmp, t=runtimeTimestamps[idx])
 					audioInput = ffmpeg.input(links[0][1], ss=stmp, t=runtimeTimestamps[idx])
-					vcodec = 'libsvtav1'
+					if links[0][2] == 'av01':
+						vcodec = 'libsvtav1'
+					else:
+						vcodec = 'libx264'
 					if stmp == '00:00:00.00':
 						vcodec = 'copy'
 						downloadProc = (

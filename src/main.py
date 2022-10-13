@@ -17,7 +17,6 @@ import sys
 
 ffmpeg_path = resource_path('bin/ffmpeg/ffmpeg', os.path.abspath(__file__))
 tempdir_parent_path = '.'
-print(ffmpeg_path)
 
 argParser = argparse.ArgumentParser(prog='tool', formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=120), usage="vcdl2 -v [VIDEO LINKS] -ts [TIMESTAMPS] [options]")
 argParser.add_argument('-v', '--video-links', nargs='*', help='link(s) to download from')

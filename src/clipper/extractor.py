@@ -30,11 +30,22 @@ def getAVUrls(debug: bool, videoLink: str, cookieFile: str):
 	if info['extractor'] == 'youtube':
 		
 		formats = info['formats'][::-1]
+		codec = ""
 		
-		best_video = next(f for f in formats if f['vcodec'].startswith('av01') and f['ext'] == 'mp4')
+		try:
+			best_video = next(f for f in formats if f['vcodec'].startswith('av01') and f['ext'] == 'mp4')
+			codec = "av01"
+		except:
+			codec = "avc1"
+			best_video = next(f for f in formats if f['vcodec'].startswith('avc1') and f['ext'] == 'mp4')
 		best_audio = next(f for f in formats if f['acodec'].startswith('mp4a') and f['ext'] == 'm4a')
 
-		return[best_video['url'], best_audio['url']]
+		if debug:
+			print(f"[EXTRACTOR/DEBUG]: VCodec: {best_video['vcodec']}")
+			print(f"[EXTRACTOR/DEBUG]: ACodec: {best_audio['acodec']}")
+			print(f"[EXTRACTOR/DEBUG]: Resolution: {best_video['resolution']}")
+
+		return[best_video['url'], best_audio['url'], codec]
 	elif info['extractor'] == 'BiliBili':
 		if 'entries' in info.keys():
 			return [info['entries'][0]['url']]
