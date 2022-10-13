@@ -1,12 +1,15 @@
 import ffmpeg
 import os
 
-def downloadClips(startTimestamps: list, runtimeTimestamps: list, links: list, ffmpeg_path: str, id_list=[]):
+def downloadClips(timestamps: list, links: list, ffmpeg_path: str, id_list=[]):
 	if len(links) > 1:
 		# TODO
 		print('[DOWNLOADER]: Funtionality not yet implemented')
 		exit()
 	else:
+		startTimestamps = timestamps[0][0]
+		runtimeTimestamps = timestamps[0][1]
+		
 		if not os.path.isdir('./vcdl_temp'):
 			os.mkdir('./vcdl_temp')
 		if len(links[0]) > 1:

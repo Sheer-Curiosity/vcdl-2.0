@@ -15,34 +15,45 @@ import argparse
 import os
 import sys
 
-ffmpeg_path = resource_path('bin/ffmpeg/ffmpeg', os.path.abspath(__file__))
+if sys.platform == 'win32':
+	ffmpeg_path = resource_path('bin/win32/ffmpeg/ffmpeg', os.path.abspath(__file__))
+if sys.platform == 'linux':
+	ffmpeg_path = resource_path('bin/linux/ffmpeg/ffmpeg', os.path.abspath(__file__))
 
-argParser = argparse.ArgumentParser()
-argParser.add_argument('-v', '--video-links', nargs='*')
-argParser.add_argument('-ts', '--timestamps')
-argParser.add_argument('-o', '--output-title', default='output')
-argParser.add_argument('-p', '--padding', default=5, type=int, choices=range(0, 31), metavar='[0-30]')
-argParser.add_argument('-ext', '--output-file-extension', default='mp4', type=str, choices=['mp4', 'mkv'], metavar='[mp4, mkv]')
+argParser = argparse.ArgumentParser(prog='tool', formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=120), usage="vcdl2 -v [VIDEO LINKS] -ts [TIMESTAMPS] [options]")
+argParser.add_argument('-v', '--video-links', nargs='*', help='link(s) to download from')
+argParser.add_argument('-ts', '--timestamps', nargs='*', help='timestamp set string. see github documentation for formatting guide')
+argParser.add_argument('-o', '--output-title', default='output', help='name of outputted video file or zip archive')
+argParser.add_argument('-p', '--padding', default=5, type=int, choices=range(0, 31), metavar='[0-30]', help='see github documentation')
+argParser.add_argument('-ext', '--output-extension', default='mp4', type=str, choices=['mp4', 'mkv'], metavar='[mp4, mkv]')
 argParser.add_argument('-m', '--merge', action='store_true', help='merge clips into one video file')
-argParser.add_argument('--debug', action='store_true', help='print more detailed information for debugging')
-argParser.add_argument('--cookiefile', default=None)
+argParser.add_argument('-cf', '--cookiefile', default=None, help='pass a Netscape cookie file to download private and members only videos')
+argParser.add_argument('--debug', action='store_true', help='print more detailed runtime information for debugging')
 args = argParser.parse_args()
 
-def runClipper(video_links: list, timestamps: str):
-	urlLinks = []
+if args.debug:
+	print(versionInfo())
+	print(buildInfo())
 
-	if len(video_links) > 1:
+def runClipper(video_links: list, timestamps: list):
+	urlLinks = []
+	timestampSets = []
+
+	if len(video_links) > 1 or len():
 		print('[EXTRACTOR]: Multi-link functionality not yet implemented')
 		sys.exit()
-	for i in video_links:
-		urlLinks.append(getAVUrls(i, args.cookiefile))
 	
-	startTs, runtimeTs = parseTimestamps(timestamps, len(urlLinks), args.padding )
+	for link in video_links:
+		urlLinks.append(getAVUrls(link, args.cookiefile))
+	
+	for set in timestamps:
+		timestampSets.append(parseTimestamps(set, args.padding))
 
-	numClips = downloadClips(startTs, runtimeTs, urlLinks, ffmpeg_path)
-	if numClips > 1:
+	clipDict = downloadClips(timestampSets, urlLinks, ffmpeg_path)
+
+	if clipDict > 1:
 		if args.merge:
-			mergeClips(numClips, args.output_title, ffmpeg_path)
+			mergeClips(clipDict, args.output_title, ffmpeg_path)
 		else:
 			packupClips(args.output_title)
 	else:
@@ -51,11 +62,18 @@ def runClipper(video_links: list, timestamps: str):
 		os.rename('./vcdl_temp/clip1.mp4', f"./{args.output_title}.mp4")
 	cleanup()
 
-if args.debug:
-	print(versionInfo(), end="")
+def main():
+	try:
+		if args.video_links != None and args.timestamps != None:
+			if args.debug:
+				print(f"[DEBUG]: Inputted Video Link(s): {args.video_links}")
+				print(f"[DEBUG]: Inputted Timestamps: {args.timestamps}")
+			runClipper(args.video_links, args.timestamps)
+		else:
+			argParser.print_help()
+	except KeyboardInterrupt:
+		print("[INFO]: Keyboard Interrupt recieved, exiting program...")
+	sys.exit(0)
 
-if args.video_links != None and args.timestamps != None:
-	if args.debug:
-		print(f"[DEBUG]: Inputted Video Link(s): {args.video_links}")
-		print(f"[DEBUG]: Inputted Timestamps: {args.timestamps}")
-	runClipper(args.video_links, args.timestamps)
+if __name__ == '__main__':
+	main()

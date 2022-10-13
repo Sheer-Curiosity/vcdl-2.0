@@ -1,7 +1,11 @@
 import os
+from version import __version__
+
+def buildInfo():
+	return (f"[DEBUG]: Build: {__version__.split('.')[3]}")
 
 def versionInfo():
-	return (f"[DEBUG]: Current Version: {read_version()}\n")
+  return (f"[DEBUG]: Version: {'.'.join(__version__.split('.')[:3])}")
 
 def generalInfo():
 	return(
@@ -14,7 +18,3 @@ Quote Of The Version:
   and determination."
   - Sheer Curiosity\n
 	''')
-
-def read_version():
-    exec(compile(open('src/version.py').read(), 'src/version.py', 'exec'))
-    return locals()['__version__']

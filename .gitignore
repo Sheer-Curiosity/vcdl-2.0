@@ -11,6 +11,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+spec/
 downloads/
 eggs/
 .eggs/
@@ -129,6 +130,7 @@ dmypy.json
 .pyre/
 
 # Stuff that shouldn't be on github
-/src/bin/ffmpeg
+/src/bin/linux/
+/src/bin/win32
 /testing stuff
 cookies.txt
