@@ -55,7 +55,7 @@ if sys.platform == 'linux':
 			'--distpath', f"{__buildpath__}/build/linux/release/bin/",
 			'--workpath', f"{__buildpath__}/build/linux/release/",
 			'--onefile',
-			'-n', f"vcdl2_{__version__}_linux",
+			'-n', f"vcdl2",
 		])
 
 elif sys.platform == 'win32':
@@ -151,5 +151,5 @@ elif sys.platform == 'win32':
 			'--specpath', f"{__buildpath__}/build/win32/release/spec/",
 			'--distpath', f"{__buildpath__}/build/win32/release/bin/",
 			'--workpath', f"{__buildpath__}/build/win32/release/",
-			'-n', f"vcdl2_{__version__}_win32",
+			'-n', f"vcdl2",
 		])
