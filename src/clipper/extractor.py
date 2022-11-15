@@ -2,7 +2,7 @@ from yt_dlp import *
 import re
 import sys
 
-class MyLogger:
+class BasicLogger:
 	def debug(self, msg):
 		if msg.startswith('[debug] '):
 			pass
@@ -18,10 +18,10 @@ class MyLogger:
 	def error(self, msg):
 		print(f"[EXTRACTOR]: {msg}")
 
-def getAVUrls(debug: bool, videoLink: str, cookieFile: str):
+def getAVUrls(debug: bool, videoLink: str, useAv1: bool, cookieFile: str):
 	info = dict
 	try:
-		info = YoutubeDL({'quiet': True, 'no_warnings': True, 'logger': MyLogger(), 'cookiefile': cookieFile}).extract_info(videoLink, download=False)
+		info = YoutubeDL({'quiet': True, 'no_warnings': True, 'logger': BasicLogger(), 'cookiefile': cookieFile}).extract_info(videoLink, download=False)
 	except:
 		sys.exit()
 
@@ -30,15 +30,18 @@ def getAVUrls(debug: bool, videoLink: str, cookieFile: str):
 	if info['extractor'] == 'youtube':
 		
 		formats = info['formats'][::-1]
-		codec = ""
-		
-		try:
-			best_video = next(f for f in formats if f['vcodec'].startswith('av01') and f['ext'] == 'mp4')
-			codec = "av01"
-		except:
+		if (useAv1):
+			try:
+				codec = "av01"
+				best_video = next(f for f in formats if f['vcodec'].startswith(codec) and f['ext'] == 'mp4')
+			except:
+				codec = "avc1"
+				best_video = next(f for f in formats if f['vcodec'].startswith(codec) and f['ext'] == 'mp4')
+			best_audio = next(f for f in formats if f['acodec'].startswith('mp4a') and f['ext'] == 'm4a')
+		else:
 			codec = "avc1"
-			best_video = next(f for f in formats if f['vcodec'].startswith('avc1') and f['ext'] == 'mp4')
-		best_audio = next(f for f in formats if f['acodec'].startswith('mp4a') and f['ext'] == 'm4a')
+			best_video = next(f for f in formats if f['vcodec'].startswith(codec) and f['ext'] == 'mp4')
+			best_audio = next(f for f in formats if f['acodec'].startswith('mp4a') and f['ext'] == 'm4a')
 
 		if debug:
 			print(f"[EXTRACTOR/DEBUG]: VCodec: {best_video['vcodec']}")

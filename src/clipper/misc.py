@@ -52,6 +52,8 @@ def calculatePadding(timestampPair: str, paddingInt: int):
 
 # There is 100% a better way to do some of the logic in this function, but I really really do not care.
 def parseTimestamps(debug: bool, timestampsInput: str, timePadding: int):
+	if (debug):
+		print(f"[TIMESTAMPS/DEBUG]: Selected padding value: {timePadding}")
 	initSplitList = timestampsInput.split(',')
 	tsList = []
 	paddedTs = []
@@ -136,6 +138,9 @@ def output_convert(output_title: str, tempdir_parent_path: str, ffmpeg_path: str
 	print(f"[FFMPEG]: {outbuff.decode('utf-8')}", end='')
 
 def compat_convert(tempdir_parent_path: str, ffmpeg_path: str):
+	"""
+	Converts all clips to h.264 for editing
+	"""
 	for idx, f in enumerate(os.listdir(f"{tempdir_parent_path}/vcdl_temp")):
 		if f.startswith('clip'):
 			print(f"[CLEANUP]: Converting clip {idx+1}...")

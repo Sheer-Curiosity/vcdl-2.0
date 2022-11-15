@@ -1,3 +1,4 @@
+from yt_dlp import *
 import ffmpeg
 import os
 
@@ -35,7 +36,7 @@ def downloadClips(debug: bool, timestamps: list, links: list, ffmpeg_path: str, 
 			if debug:
 				print(f"[DOWNLOADER/DEBUG]: Using {DPAMRE['name']} ({DPAMRE['desc']}) download method")
 			if len(links[0]) > 1:
-				print(f"[DOWNLOADER]: {len(startTimestamps)} clips found to download")
+				print(f"[DOWNLOADER]: {len(startTimestamps)} clip(s) found to download")
 				for idx, stmp in enumerate(startTimestamps):
 					print(f"[DOWNLOADER]: Downloading clip {idx+1}...")
 					videoInput = ffmpeg.input(links[0][0], ss=stmp, t=runtimeTimestamps[idx])
@@ -59,6 +60,8 @@ def downloadClips(debug: bool, timestamps: list, links: list, ffmpeg_path: str, 
 							.global_args('-hide_banner', '-loglevel', 'fatal', '-stats', '-y', '-crf', '18')
 							.run_async(cmd=ffmpeg_path, quiet=True)
 						)
+					if (debug):
+						print(f"[DOWNLOADER/DEBUG]: Using vcodec {vcodec}")
 					outbuff = bytearray()
 					while True:
 						dlProcOutput = downloadProc.stderr.read(1)
@@ -73,7 +76,7 @@ def downloadClips(debug: bool, timestamps: list, links: list, ffmpeg_path: str, 
 					print(f"[FFMPEG]: {outbuff.decode('utf-8')}", end='')
 				return (len(startTimestamps))
 			else:
-				print(f"[DOWNLOADER]: {len(startTimestamps)} clips found to download")
+				print(f"[DOWNLOADER]: {len(startTimestamps)} clip(s) found to download")
 				for idx, stmp in enumerate(startTimestamps):
 					print(f"[DOWNLOADER]: Downloading clip {idx+1}...")
 					videoInput = ffmpeg.input(links[0][0], ss=stmp, t=runtimeTimestamps[idx])
@@ -101,8 +104,8 @@ def downloadClips(debug: bool, timestamps: list, links: list, ffmpeg_path: str, 
 			if debug:
 				print(f"[DOWNLOADER/DEBUG]: Using {DWACFF['name']} ({DWACFF['desc']}) download method")
 			if len(links[0]) > 1:
-				print(f"[DOWNLOADER]: {len(startTimestamps)} clips found to download")
-				print(f"[DOWNLOADER]: Downloading video...")
+				print(f"[DOWNLOADER]: {len(startTimestamps)} clip(s) found to download")
+				print(f"[DOWNLOADER]: Downloading source video...")
 				videoInput = ffmpeg.input(links[0][0])
 				audioInput = ffmpeg.input(links[0][1])
 				downloadProc = (
@@ -146,7 +149,7 @@ def downloadClips(debug: bool, timestamps: list, links: list, ffmpeg_path: str, 
 					print(f"[FFMPEG]: {outbuff.decode('utf-8')}", end='')
 				return (len(startTimestamps))
 			else:
-				print(f"[DOWNLOADER]: {len(startTimestamps)} clips found to download")
+				print(f"[DOWNLOADER]: {len(startTimestamps)} clip(s) found to download")
 				print(f"[DOWNLOADER]: Downloading video...")
 				videoInput = ffmpeg.input(links[0][0])
 				downloadProc = (

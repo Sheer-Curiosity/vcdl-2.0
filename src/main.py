@@ -25,9 +25,11 @@ argParser.add_argument('-ot', '--output-title', default='output', help='name of 
 argParser.add_argument('-p', '--padding', default=5, type=int, choices=range(0, 31), metavar='[0-30]', help='see documentation')
 argParser.add_argument('-dm', '--download-method', default='DPAMRE', type=str, choices=['DPAMRE', 'DWACFF'], metavar='[DPAMRE, DWACFF]', help='see documentation')
 out_type = argParser.add_mutually_exclusive_group()
-out_type.add_argument('-m', '--merge-clips', action='store_true', help='merge clips into one video file')
-out_type.add_argument('-arc', '--output-archive', action='store_true', help='outputs all clips to a single zip file')
+out_type.add_argument('-omr', '--output-merged', action='store_true', help='output all clips merged into a single video file')
+out_type.add_argument('-oar', '--output-archive', action='store_true', help='output all clips seperately to a single zip archive')
 argParser.add_argument('-cf', '--cookiefile', default=None, help='Netscape cookie file for downloading private and members only videos')
+argParser.add_argument('-mc', '--maximize-compatibility', action='store_true', help='!!WARNING: ADDS RE-ENCODE!!  re-encodes the final video file(s) to h.264 to maximize compatibility.')
+argParser.add_argument('--use-av1', action='store_true', help='Download video using AV1 codec if possible')
 argParser.add_argument('--debug', action='store_true', help='print more detailed runtime information for debugging')
 args = argParser.parse_args()
 
@@ -44,7 +46,7 @@ def runClipper(video_links: list, timestamps: list):
 		sys.exit()
 	
 	for link in video_links:
-		urlLinks.append(getAVUrls(args.debug, link, args.cookiefile))
+		urlLinks.append(getAVUrls(args.debug, link, args.use_av1, args.cookiefile))
 	
 	for set in timestamps:
 		timestampSets.append(parseTimestamps(args.debug, set, args.padding))
@@ -52,19 +54,25 @@ def runClipper(video_links: list, timestamps: list):
 	clip_dict = downloadClips(args.debug, timestampSets, urlLinks, ffmpeg_path, tempdir_parent_path, args.download_method)
 
 	if clip_dict > 1:
-		if args.merge_clips:
-			mergeClips(args.debug, clip_dict, args.output_title, ffmpeg_path, tempdir_parent_path)
+		if args.output_merged:
+			mergeClips(args.debug, args.maximize_compatibility, clip_dict, args.output_title, ffmpeg_path, tempdir_parent_path)
 		elif args.output_archive:
-			compat_convert(tempdir_parent_path, ffmpeg_path)
+			if (args.maximize_compatibility):
+				compat_convert(tempdir_parent_path, ffmpeg_path)
 			packupClips(args.output_title)
 		else:
 			for f in os.listdir(f"{tempdir_parent_path}/vcdl_temp"):
 				if f.startswith('clip'):
+					if os.path.exists(os.path.join('./', f"{args.output_title}-{f}")):
+						os.remove(os.path.join('./', f"{args.output_title}-{f}"))
 					os.rename(os.path.join(f"{tempdir_parent_path}/vcdl_temp", f), os.path.join('./', f"{args.output_title}-{f}"))
 	else:
 		if os.path.exists(f"./{args.output_title}.mp4"):
 			os.remove(f"./{args.output_title}.mp4")
-		output_convert(args.output_title, tempdir_parent_path, ffmpeg_path)
+		if (args.maximize_compatibility):
+			output_convert(args.output_title, tempdir_parent_path, ffmpeg_path)
+		else:
+			os.rename(os.path.join(f"{tempdir_parent_path}/vcdl_temp", 'clip1.mp4'), os.path.join('./', f"{args.output_title}.mp4"))
 	cleanup()
 
 def main():
@@ -73,6 +81,7 @@ def main():
 			if args.debug:
 				print(f"[DEBUG]: Inputted Video Link(s): {args.video_links}")
 				print(f"[DEBUG]: Inputted Timestamp Set(s): {args.timestamps}")
+				print(f"[DEBUG]: Use AV1: {args.use_av1}")
 			runClipper(args.video_links, args.timestamps)
 		else:
 			argParser.print_help()
