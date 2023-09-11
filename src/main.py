@@ -20,6 +20,16 @@ import sys
 
 class MainWindow(QWidget):
 
+	# 0: link(s)
+	# 1: timestamps
+	# 2: output name
+	# 3: padding
+	# 4: download method
+	# 5: output merged
+	# 6: output archive
+	# 7: cookie file
+	info = ['','','','','','','','']
+
 	def __init__(self):
 		super().__init__()
 
@@ -27,31 +37,64 @@ class MainWindow(QWidget):
 
 	def initUI(self):
 
+		linksLabel = QLabel('Video Link(s)')
+		linksLabel.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+		self.links = QLineEdit()
+
 		timestampsLabel = QLabel('Timestamps')
 		timestampsLabel.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+		self.timestamps = QLineEdit()
+
 		outputNameLabel = QLabel('Output Name')
 		outputNameLabel.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+		self.outputName = QLineEdit('Output')
 
-		timestamps = QLineEdit()
-		outputName = QLineEdit('Output')
 		downloadButtonIcon = QIcon()
 		downloadButtonIcon.addFile(gui_resource_path('gui/icons/download.svg', os.path.abspath(__file__)))
-
 		downloadButton = QPushButton()
 		downloadButton.setIcon(downloadButtonIcon)
-		downloadButton.setIconSize(QSize(40, 40))
+		downloadButton.setIconSize(QSize(30, 40))
+		downloadButton.clicked.connect(self.assignAndVerifyInput)
 
-		gbDetails = QGroupBox('Details')
+		cookieFileLabel = QLabel('Netscape Cookie File')
+		cookieFileLabel.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+		cookieFileButton = QPushButton()
+		cookieFileButton.setText('Browse...')
+		cookieFileButton.setFixedWidth(80)
+		cookieFileButton.clicked.connect(self.getCookieFile)
+
+		self.dlMethodDropdown = QComboBox()
+		self.dlMethodDropdown.setFixedWidth(100)
+		self.dlMethodDropdown.setLayoutDirection()
+		self.dlMethodDropdown.addItems(['DPAMRE', 'DWACFF'])
+		self.dlMethodDropdown.setPlaceholderText('Select...')
+		self.dlMethodDropdown.setCurrentIndex(-1)
+
+		gbDetails = QGroupBox('Info')
 
 		gbGrid = QGridLayout()
-		gbGrid.setSpacing(10)
+		gbGrid.setHorizontalSpacing(10)
+		gbGrid.setVerticalSpacing(0)
 		gbDetails.setLayout(gbGrid)
 
+		gbGrid.addWidget(linksLabel, 0, 0)
+		gbGrid.addWidget(self.links, 0, 1)
+
 		gbGrid.addWidget(timestampsLabel, 1, 0)
-		gbGrid.addWidget(timestamps, 1, 1)
+		gbGrid.addWidget(self.timestamps, 1, 1)
 
 		gbGrid.addWidget(outputNameLabel, 2, 0)
-		gbGrid.addWidget(outputName, 2, 1)
+		gbGrid.addWidget(self.outputName, 2, 1)
+
+		gbGrid.addWidget(cookieFileLabel, 3, 0)
+
+		br1 = QGridLayout()
+		br1.addWidget(cookieFileButton, 0, 0)
+		br1.addWidget(self.dlMethodDropdown, 0, 1)
+
+		gbGrid.addLayout(br1, 3, 1)
+
+		gbGrid.addWidget(downloadButton, 4, 0)
 
 		grid = QGridLayout()
 		grid.setSpacing(10)
@@ -62,6 +105,23 @@ class MainWindow(QWidget):
 		self.setGeometry(300, 300, 700, 400)
 		self.setWindowTitle('VCDL2')
 		self.show()
+	
+	def getCookieFile(self):
+		fileName = QFileDialog.getOpenFileName(self,'Single File','C:\'','*.txt')
+		if fileName[0] == '':
+			return
+		else:
+			self.info[7] = fileName[0]
+
+	def assignAndVerifyInput(self):
+		info = self.info
+		info = [self.links.text(), 
+		  self.timestamps.text(), 
+		  self.outputName.text(),
+		  ]
+		
+
+
 		
 
 ffmpeg_path = ffmpeg_resource_path('bin/ffmpeg/ffmpeg', os.path.abspath(__file__))
