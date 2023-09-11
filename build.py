@@ -15,7 +15,7 @@ __buildpath__ = os.path.abspath('.')
 print(__buildpath__)
 
 # Damn you AV1
-win32_ffmpeg = 'https://github.com/GyanD/codexffmpeg/releases/download/5.1.2/ffmpeg-5.1.2-full_build.zip'
+win32_ffmpeg = 'https://github.com/GyanD/codexffmpeg/releases/download/6.0/ffmpeg-6.0-full_build.zip'
 
 argParser = argparse.ArgumentParser()
 group = argParser.add_mutually_exclusive_group()
@@ -89,11 +89,14 @@ elif sys.platform == 'win32':
 						ans = input()
 						if re.search("[yY]", ans) or ans == '':
 							print('[BUILD]: Using downloaded ffmpeg file')
+							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
 						elif re.search("[nN]", ans):
 							print('[BUILD]: Using existing ffmpeg file')
+							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
 						else:
 							print('[BUILD]: Unknown Input, assuming \"N\"')
 							print('[BUILD]: Using existing ffmpeg file')
+							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
 					else:
 						print('[BUILD]: File hashes match')
 			if fileName.endswith('ffprobe.exe'):
@@ -116,11 +119,14 @@ elif sys.platform == 'win32':
 						ans = input()
 						if re.search("[yY]", ans) or ans == '':
 							print('[BUILD]: Using downloaded ffprobe file')
+							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
 						elif re.search("[nN]", ans):
 							print('[BUILD]: Using existing ffprobe file')
+							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
 						else:
 							print('[BUILD]: Unknown Input, assuming \"N\"')
 							print('[BUILD]: Using existing ffprobe file')
+							print('[INFO]: Passing \"--force-redownload\" will force the build to use downloaded files')
 					else:
 						print('[BUILD]: File hashes match')
 	if os.path.isfile('./ffmpeg-download.zip'):
